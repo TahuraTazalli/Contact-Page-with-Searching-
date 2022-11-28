@@ -80,7 +80,7 @@ const MainPage = () => {
       });
       setData(match);
     } else {
-      console.log("Enterrrr");
+      console.log("Enterrrrrr");
       setData(apiDetail);
     }
     // setSuggestion(match);
