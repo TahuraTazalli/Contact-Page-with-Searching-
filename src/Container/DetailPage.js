@@ -9,15 +9,14 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import MoreDetails from "./MoreDetails";
 import { useHistory } from "react-router-dom";
-
+import Call from "./Call";
 const DetailPage = (props) => {
-  // const history = useHistory();
+  const history = useHistory();
 
-  // const detailsHandler = (e) => {
-  //   e.preventDefault();
-  //   history.push(`/MoreDetails`);
-
-  // };
+  const detailsHandler = (e) => {
+    e.preventDefault();
+    history.push(`/MoreDetails/${props.uuid}`);
+  };
   return (
     <div className={styles.details}>
       <Card sx={{ maxWidth: 300 }}>
@@ -42,10 +41,15 @@ const DetailPage = (props) => {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button size="small">CALL</Button>
-          {/* <Link to={`/moredetails/${props.uuid}`} size="small">
+          <Call>Call</Call>
+          {/* <Button size="small">CALL</Button> */}
+          <Button size="small" onClick={detailsHandler}>
             More Details
-          </Link> */}
+          </Button>
+
+          {/* <div className={styles.button}> */}
+          {/* <Link to={`/moredetails/${props.uuid}`}>More Details</Link> */}
+          {/* </div> */}
         </CardActions>
       </Card>
     </div>

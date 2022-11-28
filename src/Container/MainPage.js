@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
 import styles from "./DetailPage.module.css";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
@@ -11,6 +11,8 @@ import InputBase from "@mui/material/InputBase";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import DetailPage from "./DetailPage";
+import { fetchDetails } from "../Redux/Action/ActionCreator";
+import CircularIndeterminate from "./loader";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -54,53 +56,46 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 const MainPage = () => {
-  const [apiDetail, setapiDetail] = useState("");
+  const dispatch = useDispatch();
+  const detail = useSelector((state) => {
+    return state.allDetails.detail.results;
+  });
+  const loading = useSelector((state) => {
+    return state.allDetails.loading;
+  });
 
-  const [data, setData] = useState("");
+  const [data, setData] = useState([]);
   const [text, setText] = useState("");
-  const fetchData = async () => {
-    const response = await axios.get(
-      "https://randomuser.me/api/?results=20&amp;inc=name,picture,id,cell&amp;nat=in"
-    );
-    const apiData = response?.data?.results;
-    setapiDetail(apiData);
-    setData(apiData);
-  };
-  console.log(text);
 
   useEffect(() => {
-    fetchData();
+    dispatch(fetchDetails);
   }, []);
+
+  useEffect(() => {
+    setData(detail?.length ? detail : []);
+  }, [detail]);
+
   const onChangeHandler = (text) => {
     let match = [];
     if (text.length > 0) {
       const regex = new RegExp(`^${text}`, "i");
-      match = apiDetail?.filter((user) => {
-        return regex.test(user.name.first);
-      });
+      match =
+        detail.length &&
+        detail?.filter((user) => {
+          return regex.test(user.name.first);
+        });
       setData(match);
     } else {
-      console.log("Enterrrrrr");
-      setData(apiDetail);
+      setData(detail);
     }
-    // setSuggestion(match);
-
     setText(text);
   };
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
             <Typography
               variant="h6"
               noWrap
@@ -119,32 +114,32 @@ const MainPage = () => {
                 placeholder="Search…"
                 inputProps={{ "aria-label": "search" }}
               />
-              {/* {suggestion &&
-                suggestion.map((suggestion, i) => (
-                  <div key={i}>{suggestion}</div>
-                ))} */}
             </Search>
           </Toolbar>
         </AppBar>
       </Box>
-      <div className={styles.page}>
-        {data.length > 0 ? (
-          data.map((detail) => {
-            return (
-              <DetailPage
-                uuid={detail?.login?.uuid}
-                title={detail.name.title}
-                firstName={detail.name.first}
-                lastName={detail.name.last}
-                avatar={detail.picture.large}
-                phone={detail.phone}
-              />
-            );
-          })
-        ) : (
-          <p>Data not found</p>
-        )}
-      </div>
+      {loading ? (
+        <CircularIndeterminate />
+      ) : (
+        <div className={styles.page}>
+          {data.length > 0 ? (
+            data.map((detail) => {
+              return (
+                <DetailPage
+                  uuid={detail?.login?.uuid}
+                  title={detail.name.title}
+                  firstName={detail.name.first}
+                  lastName={detail.name.last}
+                  avatar={detail.picture.large}
+                  phone={detail.phone}
+                />
+              );
+            })
+          ) : (
+            <p>Data not found</p>
+          )}
+        </div>
+      )}
     </>
   );
 };

@@ -1,31 +1,38 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-
+import MoreDetailPage from "./MoreDetailPage";
 const MoreDetails = (props) => {
   const [data, setData] = useState("");
   const { userId } = useParams();
-  console.log("uuid", userId);
-  const fetchData = async () => {
-    const response = await axios.get(
-      "https://randomuser.me/api/?results=20&amp;inc=name,picture,id,cell&amp;nat=in"
-    );
-    const data = response?.data?.results;
-    setData(data);
-  };
-  useEffect(() => {
-    fetchData();
-  }, []);
-  console.log("MoreDEtailsss", data);
-  console.log("useridd", userId);
+  const details = useSelector((state) => {
+    return state.allDetails.detail.results;
+  });
 
-  const abc =
-    data?.length &&
-    data.find((detail) => {
-      console.log("detaildetail", detail?.login?.uuid);
+  const moreData =
+    details?.length &&
+    details.find((detail) => {
+      return detail?.login?.uuid === userId;
     });
-  console.log("deaaaaaaaa", abc);
+  useEffect(() => {
+    setData(moreData);
+  }, [moreData]);
 
-  return <>{}</>;
+  return (
+    <div>
+      <MoreDetailPage
+        firstName={data?.name?.first}
+        picture={data?.picture?.large}
+        lastName={data?.name?.last}
+        title={data?.name?.title}
+        cell={data.cell}
+        email={data?.email}
+        gender={data.gender}
+        city={data?.location?.city}
+        country={data?.location?.country}
+        postcode={data?.location?.postcode}
+      />
+    </div>
+  );
 };
 export default MoreDetails;
